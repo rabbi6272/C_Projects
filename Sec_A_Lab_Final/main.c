@@ -4,6 +4,7 @@
 typedef struct
 {
     int id;
+    char name[20];
     char source[20];
     char destination[20];
     char start[6];
@@ -30,7 +31,9 @@ void Admin()
             int id;
             printf("Enter train id: ");
             scanf("%d", &id);
-            char source1[20], destination1[20], start1[6], end1[6];
+            char name1[20], source1[20], destination1[20], start1[6], end1[6];
+            printf("Enter train name: ");
+            scanf("%s", name1);
             printf("Enter starting station: ");
             scanf("%s", source1);
             printf("Enter destination station: ");
@@ -41,6 +44,7 @@ void Admin()
             scanf("%s", end1);
             Train train1;
             train1.id = id;
+            strcpy(train1.name, name1);
             strcpy(train1.source, source1);
             strcpy(train1.destination, destination1);
             strcpy(train1.start, start1);
@@ -73,7 +77,9 @@ void Admin()
                 }
                 else
                 {
-                    char source1[20], destination1[20], start1[6], end1[6];
+                    char name1[20], source1[20], destination1[20], start1[6], end1[6];
+                    printf("Enter updated train name: ");
+                    scanf("%s", name1);
                     printf("Enter updated starting station: ");
                     scanf("%s", source1);
                     printf("Enter updated destination station: ");
@@ -84,6 +90,7 @@ void Admin()
                     scanf("%s", end1);
                     Train train1;
                     train1.id = aid;
+                    strcpy(train1.name, name1);
                     strcpy(train1.source, source1);
                     strcpy(train1.destination, destination1);
                     strcpy(train1.start, start1);
@@ -134,17 +141,82 @@ void Admin()
     }
 }
 
-void User() {}
+void User()
+{
+    int t = 1;
+    while (t)
+    {
+        int uchoice;
+        printf("Welcome to train management system.\n");
+
+        printf("1. Filter train info\n2. Search train info\n3. Exit\n[USER] Plaese enter your choice: ");
+        scanf("%d", &uchoice);
+
+        switch (uchoice)
+        {
+        case 1:
+            FILE *train_info = fopen("train_info.bin", "rb+");
+            if (!train_info)
+            {
+                printf("No available train info!!!\n");
+            }
+            Train read2;
+            char start[20], end[20];
+            printf("Enter start station: ");
+            scanf("%s", start);
+            printf("Enter end station: ");
+            scanf("%s", end);
+            printf("\n");
+
+            int sl = 1;
+            while (fread(&read2, sizeof(Train), 1, train_info) == 1)
+            {
+                if (strcmp(read2.source, start) == 0 && strcmp(read2.destination, end) == 0)
+                {
+                    printf("%d. ", sl++);
+                    printf("%d ", read2.id);
+                    printf("%s ", read2.name);
+                    printf("%s ", read2.start);
+                    printf("%s\n", read2.end);
+                }
+            }
+            fclose(train_info);
+            break;
+
+        case 2:
+            int utid;
+            printf("Enter train id to search: ");
+            scanf("%d", &utid);
+            FILE *train_info2 = fopen("train_info.bin", "rb+");
+            if (!train_info2)
+            {
+                printf("No available train info!!!\n");
+            }
+            Train read3;
+            while (fread(&read3, sizeof(Train), 1, train_info2) == 1)
+            {
+                if (read3.id == utid)
+                {
+                    printf("%d ", read3.id);
+                    printf("%s ", read3.name);
+                    printf("%s ", read3.source);
+                    printf("%s ", read3.destination);
+                    printf("%s ", read3.start);
+                    printf("%s\n", read3.end);
+                }
+            }
+            fclose(train_info2);
+            break;
+
+        case 3:
+            t = 0;
+            break;
+        }
+    }
+}
 
 int main()
 {
-    // opens the train_info binary file. If its not there it gets created.
-    FILE *train_info = fopen("train_info.bin", "ab+");
-    if (!train_info)
-    {
-        train_info = fopen("train_info.bin", "wb+");
-    }
-
     int t = 1;
     while (t)
     {
@@ -164,10 +236,5 @@ int main()
             break;
         }
     }
-
-    // char des[20];
-    // scanf("%s", des);
-    // Train read;
-
     return 0;
 }
